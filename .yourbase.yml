@@ -1,0 +1,32 @@
+dependencies:
+  build:
+    - ruby:2.5.0
+    - homebrew:latest
+    - node:10.15.1
+
+build_targets:
+  - name: default
+    container:
+      image: yourbase/yb_ubuntu:18.04
+    environment:
+      - DATABASE_URL=postgres://spina:spina@{{ .Containers.IP "db" }}:5432/spina
+    dependencies:
+      containers:
+        db:
+          image: postgres:9.6
+          environment:
+            - POSTGRES_PASSWORD=spina
+            - POSTGRES_USER=spina
+            - POSTGRES_DB=spina
+          port_check:
+            port: 5432
+            timeout: 45 
+    commands:
+      - brew install postgresql
+      - brew install libxml2
+      - gem update --system 2.7.9
+      - gem install bundler
+      - bundle install
+      - bundle exec rails db:setup
+      - bundle exec rake test
+
