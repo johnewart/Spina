@@ -1,13 +1,12 @@
 dependencies:
   build:
     - ruby:2.5.0
-    - homebrew:latest
     - node:10.15.1
 
 build_targets:
-  - name: default
+  - name: spec_tests
     container:
-      image: yourbase/yb_ubuntu:18.04
+      image: yourbase/yb_ubuntu:16.04
     environment:
       - DATABASE_URL=postgres://spina:spina@{{ .Containers.IP "db" }}:5432/spina
     dependencies:
@@ -22,11 +21,13 @@ build_targets:
             port: 5432
             timeout: 45 
     commands:
-      - brew install postgresql
-      - brew install libxml2
       - gem update --system 2.7.9
       - gem install bundler
       - bundle install
       - bundle exec rails db:setup
       - bundle exec rake test
 
+ci:
+  builds:
+    - name: spec tests
+      build_target: spec_tests
